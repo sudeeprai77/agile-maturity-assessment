@@ -105,7 +105,7 @@ def render_wizard():
             st.divider()
 
         # Both admins and non-admins should be able to view questions
-        render_questions(role=role)
+        render_questions()
 
     elif st.session_state.wizard_step == 5:
         st.header("Step 5: Self Assessment")
