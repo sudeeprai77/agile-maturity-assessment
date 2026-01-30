@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from db.database import get_connection
 from services.repository import fetch_one, execute
 
+
+
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
@@ -27,17 +29,28 @@ def _ensure_sessions_table():
         conn.close()
 
 def authenticate(username, password):
+    # Normalize input
+    username = username.strip()
+    password = password.strip()
+
     user = fetch_one(
         "SELECT id, role, password_hash FROM users WHERE username = ?",
         (username,)
     )
+
+    print("AUTH DB USER:", user)
+
     if not user:
         return None
 
     uid, role, pw_hash = user
-    if hash_password(password) == pw_hash:
+
+    # Normalize stored hash just in case
+    if hash_password(password) == pw_hash.strip():
         return {"id": uid, "role": role, "username": username}
+
     return None
+
 
 def create_session(user_id, username, role):
     """Create a persistent session token for the user"""
